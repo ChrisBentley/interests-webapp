@@ -16,7 +16,13 @@
   "dependencies": {
     "express": "^4.15.3",
     "express-promise": "^0.4.0",
-    "jsdom": "^11.1.0",
+    "jsdom": "^11.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.0",
+    "chai-as-promised": "^7.1.1",
+    "mock-express-response": "^0.2.1",
+    "sinon-chai": "^2.11.0",
     "mocha": "^3.4.2",
     "sinon": "^2.3.8"
   }
