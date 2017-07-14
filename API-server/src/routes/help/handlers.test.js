@@ -7,7 +7,7 @@ let request = new MockExpressRequest;
 let response = new MockExpressResponse;
 let next = function() {};
 
-describe('Testing help route handlers', () => {
+describe('Testing help route handler', () => {
 
     beforeEach(() => {
         // console.log('beforeEach ran');
