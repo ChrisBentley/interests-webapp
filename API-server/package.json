@@ -1,0 +1,23 @@
+{
+  "name": "data-scraper",
+  "version": "1.0.0",
+  "description": "An express API server that interfaces with mongoDB",
+  "main": "scraper.js",
+  "scripts": {
+    "start": "node ./src/server.js",
+    "test": "mocha unitTestConfig.js ./src/**/*.test.js"
+  },
+  "engines": {
+    "node": "6.9.1",
+    "npm": "3.10.8"
+  },
+  "author": "Chris Bentley",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "express-promise": "^0.4.0",
+    "jsdom": "^11.1.0",
+    "mocha": "^3.4.2",
+    "sinon": "^2.3.8"
+  }
+}

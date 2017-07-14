@@ -1,0 +1,1 @@
+console.log('interests handler test not implemented yet');
