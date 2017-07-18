@@ -1,8 +1,21 @@
 const cheerio = require('cheerio');
 
-const $ = cheerio.load('<h2 class="title">Hello world</h2>');
+var request = require('request');
 
-$('h2.title').text('Hello there!');
-$('h2').addClass('welcome');
+request('http://www.goodreads.com/review/list/52192894?shelf=currently-reading', function(error, response, html) {
+  if (!error && response.statusCode == 200){
+    // console.log(html);
+    var $ = cheerio.load(html);
 
-console.log($.html());
+    const booksElements = $('#booksBody').children();
+
+    var bookTitles = [];
+
+    for(var i=0; i < booksElements.length; i++) {
+      $ = cheerio.load(booksElements[i]);
+      bookTitles.push($('.title .value').text().trim());
+    }
+
+    console.log(bookTitles);
+  }
+});
