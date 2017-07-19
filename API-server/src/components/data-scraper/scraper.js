@@ -1,3 +1,5 @@
+const { DbItem } = require('./databaseItem/databaseItem');
+
 const cheerio = require('cheerio');
 
 var request = require('request');
@@ -15,25 +17,26 @@ request(requestUrl, function(error, response, html) {
 
     for(var i=0; i < booksElements.length; i++) {
       $ = cheerio.load(booksElements[i]);
-      var bookDetails = {};
 
-      bookDetails.title = $('.title .value').text().trim();
+      var bookItem = new DbItem('book');
+
+      bookItem.title = $('.title .value').text().trim();
 
       var smallImgUrl = $('.cover .value div div a img').attr('src').split('s/');
-      bookDetails.imgUrl = smallImgUrl[0] + 's/' + smallImgUrl[1] + 'l/' + smallImgUrl[2];
+      bookItem.imgUrl = smallImgUrl[0] + 's/' + smallImgUrl[1] + 'l/' + smallImgUrl[2];
 
       var author = $('.author .value a').text().trim().split(', ');
-      bookDetails.author = author[1] + ' ' + author[0];
+      bookItem.author = author[1] + ' ' + author[0];
 
-      bookDetails.avgRating = $('.avg_rating .value').text().trim();
+      bookItem.avgRating = $('.avg_rating .value').text().trim();
 
-      bookDetails.myRating = $('.shelves .value .stars').attr('data-rating');
+      bookItem.myRating = $('.shelves .value .stars').attr('data-rating');
 
-      bookDetails.dateAdded = $('.date_added .value span').text().trim();
+      bookItem.dateAdded = $('.date_added .value span').text().trim();
 
-      bookDetails.dateCompleted = $('.date_read .value span').text().trim();
+      bookItem.dateCompleted = $('.date_read .value span').text().trim();
 
-      books.push(bookDetails);
+      books.push(bookItem);
     }
 
     console.log(books);
