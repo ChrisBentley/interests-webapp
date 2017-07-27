@@ -14,6 +14,7 @@ class DbItem {
     this.platform = null;
     this.ratingScale = null;
     this.progress = null;
+    this.mediaType = null;
 
     if ( this.type === 'book' || this.type === 'game') {
       this.ratingScale = 5;

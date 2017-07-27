@@ -4,10 +4,22 @@ const cheerio = require('cheerio');
 
 var request = require('request');
 
-var requestUrl = 'https://www.goodreads.com/review/list/52192894?shelf=currently-reading';
+var booksRequestUrl = 'https://www.goodreads.com/review/list/52192894?shelf=currently-reading';
+var animeRequestUrl = 'https://myanimelist.net/animelist/chrisbentley?status=1';
 
-request(requestUrl, function(error, response, html) {
-  if (!error && response.statusCode == 200){
+function getWebsiteHtml(requestUrl) {
+  return new Promise((resolve, reject) => {
+    request(requestUrl, (error, response, html) => {
+      if (error || response.statusCode != 200) {
+        reject(error);
+      }
+      resolve(html);
+    });
+  });
+}
+
+function getBooks() {
+  return getWebsiteHtml(booksRequestUrl).then( html => {
 
     var $ = cheerio.load(html);
 
@@ -39,6 +51,39 @@ request(requestUrl, function(error, response, html) {
       books.push(bookItem);
     }
 
-    console.log(books);
-  }
+    return books;
+  });
+}
+
+function getAnime() {
+  return getWebsiteHtml(animeRequestUrl).then( html => {
+    var $ = cheerio.load(html);
+
+    const animeData = JSON.parse($('.list-unit.watching table').attr('data-items'));
+
+    var anime = [];
+
+    for(var i=0; i < animeData.length; i++) {
+      item = animeData[i];
+
+      var animeItem = new DbItem('anime');
+
+      animeItem.title = item.anime_title;
+      animeItem.imgUrl = item.anime_image_path;
+      animeItem.mediaType = item.anime_media_type_string;
+      animeItem.myRating = item.score;
+      animeItem.progress = item.num_watched_episodes + ' / ' + item.anime_num_episodes;
+
+      anime.push(animeItem);
+    }
+
+    return anime;
+  });
+}
+
+
+var getInterests = [getBooks(), getAnime()];
+
+Promise.all(getInterests).then(results => {
+  console.log(results);
 });
