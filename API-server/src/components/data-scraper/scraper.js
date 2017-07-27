@@ -6,6 +6,7 @@ var request = require('request');
 
 var booksRequestUrl = 'https://www.goodreads.com/review/list/52192894?shelf=currently-reading';
 var animeRequestUrl = 'https://myanimelist.net/animelist/chrisbentley?status=1';
+var gamesRequestUrl = 'https://www.grouvee.com/user/cjbcrazy/shelves/66578-playing/?num=100';
 
 function getWebsiteHtml(requestUrl) {
   return new Promise((resolve, reject) => {
@@ -81,8 +82,55 @@ function getAnime() {
   });
 }
 
+function getGames() {
+  return getWebsiteHtml(gamesRequestUrl).then( html => {
+    var $ = cheerio.load(html);
 
-var getInterests = [getBooks(), getAnime()];
+    const gamesElements = $('#sorted-table .table tbody').children();
+
+    var games = [];
+
+    for(var i=0; i < gamesElements.length; i++) {
+      $ = cheerio.load(gamesElements[i]);
+
+      var gameItem = new DbItem('game');
+
+      var gameDetails = [];
+      $('td').each(function(i, elem) {
+        gameDetails[i] = $(this);
+      });
+
+      var imgUrl = cheerio.load(gameDetails[0].html());
+      var title = cheerio.load(gameDetails[1].html());
+      var rating = cheerio.load(gameDetails[2].html());
+      var avgRating = cheerio.load(gameDetails[4].html());
+      var releaseDate = cheerio.load(gameDetails[5].html());
+      var dateAdded = cheerio.load(gameDetails[6].html());
+      var dateCompleted = cheerio.load(gameDetails[7].html());
+
+      gameItem.imgUrl = 'https' + imgUrl('a img').attr('src');
+      gameItem.title = title('.wrapper a').text();
+
+      var extractedRating = rating('div span').attr('title')[0];
+      if (extractedRating === ' ') {
+        gameItem.myRating = '0';
+      } else {
+        gameItem.myRating = extractedRating;
+      }
+
+      gameItem.avgRating = avgRating.text().trim();
+      gameItem.releaseDate = releaseDate.text().trim();
+      gameItem.dateAdded = dateAdded.text().trim();
+      gameItem.dateCompleted = dateCompleted.text().trim();
+
+      games.push(gameItem);
+    }
+
+    return games;
+  });
+}
+
+var getInterests = [getBooks(), getAnime(), getGames()];
 
 Promise.all(getInterests).then(results => {
   console.log(results);
