@@ -7,6 +7,7 @@ var request = require('request');
 var booksRequestUrl = 'https://www.goodreads.com/review/list/52192894?shelf=currently-reading';
 var animeRequestUrl = 'https://myanimelist.net/animelist/chrisbentley?status=1';
 var gamesRequestUrl = 'https://www.grouvee.com/user/cjbcrazy/shelves/66578-playing/?num=100';
+var filmsRequestUrl = 'http://www.imdb.com/list/ls069444183/';
 
 function getWebsiteHtml(requestUrl) {
   return new Promise((resolve, reject) => {
@@ -19,9 +20,34 @@ function getWebsiteHtml(requestUrl) {
   });
 }
 
+function getFilms() {
+  return getWebsiteHtml(filmsRequestUrl).then( html => {
+    var $ = cheerio.load(html);
+
+    const filmsElements = $('#main div .list').children();
+
+    var films = [];
+
+    for(var i=0; i < filmsElements.length; i++) {
+      $ = cheerio.load(filmsElements[i]);
+
+      var filmItem = new DbItem('film');
+
+      filmItem.imgUrl = $('.image a div img').attr('src');
+      filmItem.title = $('.info b a').text();
+      filmItem.releaseDate = $('.info b span').text();
+      filmItem.avgRating = $('.info .rating .rating-rating .value').text();
+
+
+      films.push(filmItem);
+    }
+
+    return films;
+  });
+}
+
 function getBooks() {
   return getWebsiteHtml(booksRequestUrl).then( html => {
-
     var $ = cheerio.load(html);
 
     const booksElements = $('#booksBody').children();
@@ -130,7 +156,9 @@ function getGames() {
   });
 }
 
-var getInterests = [getBooks(), getAnime(), getGames()];
+var getInterests = [getFilms()];
+
+// var getInterests = [getBooks(), getAnime(), getGames()];
 
 Promise.all(getInterests).then(results => {
   console.log(results);
