@@ -35,9 +35,17 @@ function getFilms() {
 
       filmItem.imgUrl = $('.image a div img').attr('src');
       filmItem.title = $('.info b a').text();
-      filmItem.releaseDate = $('.info b span').text();
       filmItem.avgRating = $('.info .rating .rating-rating .value').text();
 
+      var releaseDate = $('.info b span').text();
+      if (releaseDate.length > 6) {
+        filmItem.type = 'tv';
+      }
+      filmItem.releaseDate = releaseDate.slice(1, 5);
+
+      if (filmItem.type === 'film') {
+        filmItem.director = $('.info .secondary a').html();
+      }
 
       films.push(filmItem);
     }
@@ -156,10 +164,10 @@ function getGames() {
   });
 }
 
-var getInterests = [getFilms()];
-
-// var getInterests = [getBooks(), getAnime(), getGames()];
+var getInterests = [getBooks(), getAnime(), getGames(), getFilms()];
 
 Promise.all(getInterests).then(results => {
-  console.log(results);
+  var interests = [].concat.apply([], results);
+
+  console.log(interests);
 });
